@@ -6,20 +6,28 @@ let flippedCards = [];
 function match(flippedCards){
   // accede a la URL de la imagen de cada card
   const img1Src = flippedCards[0].querySelector(".card-img").src;
-  const img2Src = flippedCards[1].querySelector(".card-img").src;
+  const img2Src = flippedCards[1].querySelector(".card-img").src
 
-
+  //MATCH
   if(img1Src === img2Src){
-    console.log("match")
-    flippedCards.length = 0; //vacia el array
-  }else {
+    setTimeout(() => {
+      flippedCards.forEach((cardMatch) => {
+          cardMatch.classList.add("card__match")
+        })
+    }, 1000)
+
+    setTimeout(() => {
+      flippedCards.length = 0; // Vacía el array  solo cuando ya se aplicaron las clases
+    }, 1000);
+
+  }else { //NO MATCH
     setTimeout(() => {
       flippedCards.forEach((cardNoMatch) => {
         cardNoMatch.classList.remove("card__flipped");
       });
       //Vacía el array de cartas volteadas despues de que se hayan volteado
       flippedCards.length = 0;
-    }, 1000);
+    }, 1000)
   }
 
 }
