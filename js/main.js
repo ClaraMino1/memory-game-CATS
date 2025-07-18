@@ -1,10 +1,37 @@
 const container = document.getElementById("container");
 const url = "https://cataas.com/cat/";
 let cards = [];
+let flippedCards = [];
 
-function flip(card) {// funcion para dar vuelta la card
-  card.classList.add("card__flipped");
+function match(flippedCards){
+  // accede a la URL de la imagen de cada card
+  const img1Src = flippedCards[0].querySelector(".card-img").src;
+  const img2Src = flippedCards[1].querySelector(".card-img").src;
+
+
+  if(img1Src === img2Src){
+    console.log("match")
+    flippedCards.length = 0; //vacia el array
+  }else {
+    setTimeout(() => {
+      flippedCards.forEach((cardNoMatch) => {
+        cardNoMatch.classList.remove("card__flipped");
+      });
+      //Vacía el array de cartas volteadas despues de que se hayan volteado
+      flippedCards.length = 0;
+    }, 1000);
+  }
+
 }
+function flip(card) {// funcion para dar vuelta la card
+  flippedCards.push(card) //agrega la card a el array de cards volteadas
+  card.classList.add("card__flipped")
+
+  if(flippedCards.length === 2){ // si hay dos cartas volteadas se evalúa coincidencia
+    match(flippedCards)
+  }
+}
+
 
 function shuffle(array) { //generar una repartida aleatoria
   for (let i = array.length - 1; i > 0; i--) {
@@ -46,7 +73,12 @@ async function getCatImages(numberOfImages) {
       img.alt = "imagen de gato";
       img.onload = () => { //solo se puede dar vuelta una vez que cargó la img
         card.addEventListener("click", () => {
-          flip(card);
+
+          let cardsFlipped = document.querySelectorAll(".card__flipped")
+
+          if(cardsFlipped.length <= 1){//permite seguir dando vuelta si no se dio vuelta ningunga carta todavia o si se dio vuelta solo una carta
+            flip(card);
+          }
         });
       } 
 
