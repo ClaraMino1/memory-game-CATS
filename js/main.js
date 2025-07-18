@@ -1,6 +1,7 @@
 const container = document.getElementById("container");
 const url = "https://cataas.com/cat/";
 let cards = [];
+let canFlip = true;
 let flippedCards = [];
 
 function match(flippedCards){
@@ -11,15 +12,15 @@ function match(flippedCards){
   //MATCH
   if(img1Src === img2Src){
     setTimeout(() => {
+      //aplica la clase y deshabilita los clicks
       flippedCards.forEach((cardMatch) => {
-          cardMatch.classList.add("card__match")
-        })
-    }, 1000)
-
-    setTimeout(() => {
-      flippedCards.length = 0; // Vacía el array  solo cuando ya se aplicaron las clases
+        cardMatch.classList.add("card__match");
+        cardMatch.removeEventListener("click", cardMatch.clickHandler);
+      });
+      //vacía el array y habilita los volteos
+      flippedCards.length = 0;
+      canFlip = true;
     }, 1000);
-
   }else { //NO MATCH
     setTimeout(() => {
       flippedCards.forEach((cardNoMatch) => {
@@ -27,19 +28,26 @@ function match(flippedCards){
       });
       //Vacía el array de cartas volteadas despues de que se hayan volteado
       flippedCards.length = 0;
+      
+      canFlip = true;// Habilita la capacidad de voltear cartas de nuevo
     }, 1000)
   }
 
 }
-function flip(card) {// funcion para dar vuelta la card
-  flippedCards.push(card) //agrega la card a el array de cards volteadas
-  card.classList.add("card__flipped")
 
-  if(flippedCards.length === 2){ // si hay dos cartas volteadas se evalúa coincidencia
-    match(flippedCards)
-  }
+function flip(card) {
+    // Solo permitir voltear si canFlip es true y la carta no está ya volteada o emparejada
+    if (!canFlip || card.classList.contains("card__flipped") || card.classList.contains("card__match")) {
+        return;
+    }
+
+    flippedCards.push(card); // Agrega la card al array de cards volteadas
+    card.classList.add("card__flipped");
+
+    if (flippedCards.length === 2) { // Si hay dos cartas volteadas se evalúa coincidencia
+        match(flippedCards);
+    }
 }
-
 
 function shuffle(array) { //generar una repartida aleatoria
   for (let i = array.length - 1; i > 0; i--) {
@@ -79,16 +87,17 @@ async function getCatImages(numberOfImages) {
       img.classList.add("card-img");
       img.src = imageUrl;
       img.alt = "imagen de gato";
-      img.onload = () => { //solo se puede dar vuelta una vez que cargó la img
-        card.addEventListener("click", () => {
 
-          let cardsFlipped = document.querySelectorAll(".card__flipped")
+      card.clickHandler = () => {
+      if (canFlip && flippedCards.length < 2 && !card.classList.contains("card__flipped") && !card.classList.contains("card__match")) {
+        
+        flip(card);
+        }
+      };
 
-          if(cardsFlipped.length <= 1){//permite seguir dando vuelta si no se dio vuelta ningunga carta todavia o si se dio vuelta solo una carta
-            flip(card);
-          }
-        });
-      } 
+      img.onload = () => { // solo se puede dar vuelta una vez que cargó la img
+        card.addEventListener("click", card.clickHandler);
+      };
 
       cardContent.appendChild(img);
       card.appendChild(cardContent);
