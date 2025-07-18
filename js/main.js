@@ -44,14 +44,16 @@ async function getCatImages(numberOfImages) {
       img.classList.add("card-img");
       img.src = imageUrl;
       img.alt = "imagen de gato";
+      img.onload = () => { //solo se puede dar vuelta una vez que cargó la img
+        card.addEventListener("click", () => {
+          flip(card);
+        });
+      } 
 
       cardContent.appendChild(img);
       card.appendChild(cardContent);
       container.appendChild(card);
 
-      card.addEventListener("click", () => {
-        flip(card);
-      });
     });
 
   } catch (error) {
