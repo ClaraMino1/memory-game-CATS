@@ -1,38 +1,57 @@
 const container = document.getElementById("container");
-const url = "https://cataas.com/cat/"; //url para luego concatenar el id y generar la img
+const url = "https://cataas.com/cat/";
 let cards = [];
+
+function flip(card) {// funcion para dar vuelta la card
+  card.classList.add("card__flipped");
+}
+
+function shuffle(array) { //generar una repartida aleatoria
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 
 async function getCatImages(numberOfImages) {
   try {
     const response = await fetch(`https://cataas.com/api/cats?limit=${numberOfImages}`);
     const data = await response.json();
 
-    data.forEach(item => { //por cada img que le llega filtra las que son png o jpeg
-      if (item.mimetype === 'image/jpeg' || item.mimetype === 'image/png') {
-        console.log("aceptada");
+    const validImages = data.filter(item => //genera un array con las imágenes válidas
+      item.mimetype === 'image/jpeg' || item.mimetype === 'image/png'
+    );
 
-        let imageId = item.id; //obtiene el id de la img
-        let imageUrl = url + imageId; //concatena para generar una url
-        cards.push(imageUrl); //agrega al array
+    // Limita solo a la cantidad que se pidió (por si hay más de 9 válidas)
+    const selectedImages = validImages.slice(0, numberOfImages);
+    cards = selectedImages.map(item => url + item.id);
 
-        const card = document.createElement("div");//crea card
-        card.classList.add("card");
+    // DUPLICAR + MEZCLAR
+    const duplicatedCards = [...cards, ...cards];
+    shuffle(duplicatedCards);
 
-        const cardContent = document.createElement("div"); //crea cardContent
-        cardContent.classList.add("card__content");
+    // LIMPIAR CONTENEDOR
+    container.innerHTML = "";
 
-        const img = document.createElement("img"); //crea la img
-        img.classList.add("card-img");
-        img.src = imageUrl; //le asigna la img que hay en el array
-        img.alt = "imagen de gato";
+    duplicatedCards.forEach(imageUrl => {
+      const card = document.createElement("div"); //por cada carta genera un div
+      card.classList.add("card");
 
-      
-        cardContent.appendChild(img);
-        card.appendChild(cardContent);
-        container.appendChild(card);
-      } else {
-        console.log("gif no aceptado");
-      }
+      const cardContent = document.createElement("div");
+      cardContent.classList.add("card__content");
+
+      const img = document.createElement("img");//crea una img para poder mostrar las imagenes
+      img.classList.add("card-img");
+      img.src = imageUrl;
+      img.alt = "imagen de gato";
+
+      cardContent.appendChild(img);
+      card.appendChild(cardContent);
+      container.appendChild(card);
+
+      card.addEventListener("click", () => {
+        flip(card);
+      });
     });
 
   } catch (error) {
@@ -40,4 +59,4 @@ async function getCatImages(numberOfImages) {
   }
 }
 
-getCatImages(17);
+getCatImages(9);

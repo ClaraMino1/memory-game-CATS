@@ -69,14 +69,13 @@ main {
   justify-content: center;
   align-items: center;
   font-size: 2.5rem;
-  padding-top: 0.4rem;
 }
 
 .card__content::selection {
   background: transparent;
 }
 
-.tarjeta.descubierta {
+.card__flipped {
   transform: rotateY(-180deg);
 }
 
