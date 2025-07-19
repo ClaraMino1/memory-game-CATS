@@ -1,24 +1,24 @@
-const container = document.getElementById("container");
-const timerElement = document.getElementById("timer");
-const url = "https://cataas.com/cat/"; //url para luego concatenar la cantidad de imagenes que quiero traer
+const container = document.getElementById("container")
+const timerElement = document.getElementById("timer")
+const url = "https://cataas.com/cat/" //url para luego concatenar la cantidad de imagenes que quiero traer
 
-let cards = [];
-let flippedCards = [];
-let canFlip = true;
-let gameStarted = false;
-let gameWon = false;
+let cards = []
+let flippedCards = []
+let canFlip = true
+let gameStarted = false
+let gameWon = false
 
 //para manejar el timer
-let seconds = 0;
-let minutes = 0;
-let timerInterval;
+let seconds = 0
+let minutes = 0
+let timerInterval
 
 function startTimer() {
   timerInterval = setInterval(() => {
-    seconds++; //aumenta cada segundo
+    seconds++ //aumenta cada segundo
     if (seconds === 60) {//formatea a minutos y reestablece los segundos
-      minutes++;
-      seconds = 0;
+      minutes++
+      seconds = 0
     }
     timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }, 1000);
@@ -26,6 +26,10 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
+}
+
+function playAgain(numberOfImages){
+  getCatImages(numberOfImages)
 }
 
 function match(flippedCards) {
@@ -69,7 +73,11 @@ function match(flippedCards) {
             left top
             no-repeat
           `
-        });
+        }).then((result)=>{
+          if(result.isConfirmed){
+            playAgain(3)
+          }
+        })
       }
     }, 800); // este timeout espera a que el flip se vea bien
   } else {
@@ -156,12 +164,12 @@ async function getCatImages(numberOfImages) {
       };
 
       img.onload = () => {
-        card.addEventListener("click", card.clickHandler);
+        card.addEventListener("click", card.clickHandler)
       };
 
-      cardContent.appendChild(img);
-      card.appendChild(cardContent);
-      container.appendChild(card);
+      cardContent.appendChild(img)
+      card.appendChild(cardContent)
+      container.appendChild(card)
     })
 
   } catch (error) {
@@ -169,4 +177,4 @@ async function getCatImages(numberOfImages) {
   }
 }
 
-getCatImages(2);
+playAgain(3) //iniciar partida
