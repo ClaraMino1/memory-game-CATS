@@ -7,8 +7,6 @@
 
  :root {
   --bg: #fafafa;
-  --font: "Archivo", sans-serif;
-  --font-display: "Archivo Narrow", sans-serif;
   --hotpink: #e94057;
   --red: #f22121;
   --gradient: linear-gradient(35deg, var(--red), var(--hotpink));
@@ -18,7 +16,6 @@ body {
   margin: auto;
   min-height: 100vh;
   background: var(--bg);
-  font-family: var(--font);
   font-size: 2rem;
   display: flex;
   flex-direction: column;
@@ -85,8 +82,6 @@ main {
   object-fit: cover;
 }
 
-
-
 @keyframes matchFade {
   0% {
     transform: scale(1);
@@ -112,5 +107,5 @@ main {
   text-align: center;
   margin-top: 2rem;
   font-weight: bold;
-  color: #e94057;
+  color: var(--hotpink);
 }
