@@ -4,6 +4,33 @@ let cards = [];
 let canFlip = true;
 let flippedCards = [];
 
+//para el timer
+let gameStarted = false;
+let timerElement = document.getElementById("timer");
+let seconds = 0;
+let minutes = 0;
+let timerInterval;
+
+function startTimer() { //función para iniciar el timer
+  timerInterval = setInterval(() => {
+    seconds++ //incrementa los segundos
+
+    if (seconds === 60) { //convierte a minutos y reestablece los segundos
+      minutes++
+      seconds = 0
+    }
+
+    let formattedMinutes = minutes.toString().padStart(2, "0");
+    let formattedSeconds = seconds.toString().padStart(2, "0");
+
+    timerElement.textContent = `${formattedMinutes}:${formattedSeconds}`;
+  }, 1000);
+}
+
+function stopTimer() { //función para parar el timer
+  clearInterval(timerInterval);
+}
+
 function match(flippedCards){
   // accede a la URL de la imagen de cada card
   const img1Src = flippedCards[0].querySelector(".card-img").src;
@@ -36,6 +63,10 @@ function match(flippedCards){
 }
 
 function flip(card) {
+   if (!gameStarted) { //si el juego no empezó, al dar vuelta una card, inicia el timer y cambia el estado del juego a empezado
+    startTimer();
+    gameStarted = true;
+  }
     // Solo permitir voltear si canFlip es true y la carta no está ya volteada o emparejada
     if (!canFlip || card.classList.contains("card__flipped") || card.classList.contains("card__match")) {
         return;
@@ -45,7 +76,12 @@ function flip(card) {
     card.classList.add("card__flipped");
 
     if (flippedCards.length === 2) { // Si hay dos cartas volteadas se evalúa coincidencia
-        match(flippedCards);
+      match(flippedCards);
+    }
+
+    if(cards.length === document.querySelectorAll(".card__match").length ){ //si ya no quedan cartas en el tablero
+      console.log("ganaste")
+      stopTimer()
     }
 }
 
@@ -97,6 +133,7 @@ async function getCatImages(numberOfImages) {
 
       img.onload = () => { // solo se puede dar vuelta una vez que cargó la img
         card.addEventListener("click", card.clickHandler);
+        
       };
 
       cardContent.appendChild(img);
@@ -110,4 +147,4 @@ async function getCatImages(numberOfImages) {
   }
 }
 
-getCatImages(9);
+getCatImages(2);
