@@ -80,7 +80,28 @@ function flip(card) {
     }
 
     if(cards.length === document.querySelectorAll(".card__match").length ){ //si ya no quedan cartas en el tablero
-      console.log("ganaste")
+    setTimeout(()=>{
+        Swal.fire({
+        icon: "success",
+        title: "¡GANASTE!",
+        text: `Tu tiempo: ${timerElement.innerText}`,
+        confirmButtonText: "Jugar de nuevo",
+        confirmButtonColor: "#3085d6",
+        allowOutsideClick: false, //no se puede hacer click afuera para cerrarlo
+        allowEscapeKey: false,// no se puede presionar esc para cerrarlo
+        width: 550,
+        padding: "3em",
+        color: "#e94057",
+        background: "#F5F5F5",
+        backdrop: `
+          rgba(0,0,123,0.4)
+          url("https://i.gifer.com/PYh.gif")
+          left top
+          no-repeat
+        `
+      })
+    },2000)
+      
       stopTimer()
     }
 }
