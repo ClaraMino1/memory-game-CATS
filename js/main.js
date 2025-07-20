@@ -1,3 +1,11 @@
+document.querySelectorAll('.accordion-header').forEach(header => { //acordeón de los niveles
+  header.addEventListener('click', () => {
+    const content = header.nextElementSibling;
+    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    header.classList.toggle('active');
+  });
+});
+
 const container = document.getElementById("container")
 const timerElement = document.getElementById("timer")
 const url = "https://cataas.com/cat/" //url para luego concatenar la cantidad de imagenes que quiero traer

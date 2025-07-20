@@ -12,6 +12,16 @@
   --gradient: linear-gradient(35deg, var(--red), var(--hotpink));
 }
 
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 2rem;
+    position: relative;
+    height: 80px;
+    background: var(--bg);
+}
+
 body {
   margin: auto;
   min-height: 100vh;
@@ -21,13 +31,6 @@ body {
   flex-direction: column;
 }
 
-main {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  position: relative;
-}
-
 #container {
   display: flex;
   flex-wrap: wrap;
@@ -35,6 +38,68 @@ main {
   align-content: center;
   max-width: 50rem;
   margin: auto;
+}
+
+/* ACORDEÓN*/
+.accordion {
+  position: absolute;
+  left: 2rem;
+  top: 1.5rem;
+}
+
+.accordion-item {
+  width: 150px;
+}
+
+.accordion-header {
+  background: var(--gradient);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.accordion-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.accordion-content {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 100%;
+  background: #fff;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 100;
+}
+
+.accordion-content p {
+  padding: 0.5rem;
+  margin: 0;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.accordion-content p:hover {
+  background: #f5f5f5;
+  color: var(--hotpink);
+}
+
+.accordion-item.active .accordion-content {
+  display: block;
+}
+
+.accordion-item.active .accordion-header {
+  border-radius: 5px 5px 0 0;
 }
 
 .card {
@@ -102,10 +167,11 @@ main {
   pointer-events: none;
 }
 
-#timer{
+#timer {
+  margin-top: 15px;
   font-size: 3rem;
-  text-align: center;
-  margin-top: 2rem;
   font-weight: bold;
   color: var(--hotpink);
+  text-align: center;
+  flex-grow: 1;
 }
