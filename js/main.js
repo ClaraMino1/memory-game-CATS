@@ -3,7 +3,7 @@ const timerElement = document.getElementById("timer")
 const url = "https://cataas.com/cat/" //url para luego concatenar la cantidad de imagenes que quiero traer
 
 let cards = []
-let flippedCards = []
+let flippedCards = []  // Guarda las cartas que están volteadas temporalmente
 let canFlip = true
 let gameStarted = false
 let gameWon = false
@@ -12,6 +12,52 @@ let gameWon = false
 let seconds = 0
 let minutes = 0
 let timerInterval
+
+function saveGameState(){ //crea un objeto con todo el estado actual del juego y lo guarda en localStorage
+ const gameState = {
+    cards: cards, // Las URLs de las imágenes originales
+    flippedCards: Array.from(document.querySelectorAll('.card__flipped')).map(card => { //cartas que se dieron vuelta
+      return {
+        index: Array.from(container.children).indexOf(card),
+        imgSrc: card.querySelector('.card-img').src
+      };
+    }),
+    matchedCards: Array.from(document.querySelectorAll('.card__match')).map(card => { //cartas emparejadas
+      return {
+        index: Array.from(container.children).indexOf(card),
+        imgSrc: card.querySelector('.card-img').src
+      };
+    }),
+    seconds: seconds,
+    minutes: minutes,
+    gameStarted: gameStarted,
+    gameWon: gameWon
+  };
+
+  localStorage.setItem('memoryGameState', JSON.stringify(gameState)) //guarda en localStorage
+}
+
+function loadGameState() {
+  const savedState = localStorage.getItem('memoryGameState');
+  if (!savedState) return false;// Si no hay estado guardado
+  
+  const gameState = JSON.parse(savedState);
+  
+  // Restaurar las variables básicas
+  cards = gameState.cards;
+  seconds = gameState.seconds;
+  minutes = gameState.minutes;
+  gameStarted = gameState.gameStarted;
+  gameWon = gameState.gameWon;
+  
+  // Actualizar el timer
+  timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  if (gameStarted && !gameWon) {
+    startTimer();// Reanuda el temporizador si el juego estaba empezado y no ganado
+  }
+  
+  return true;
+}
 
 function startTimer() {
   timerInterval = setInterval(() => {
@@ -28,8 +74,9 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-function playAgain(numberOfImages){
-  getCatImages(numberOfImages)
+function playAgain(numberOfImages){// Limpiar el estado guardado si se inicia un juego nuevo
+  localStorage.removeItem('memoryGameState');
+  getCatImages(numberOfImages);
 }
 
 function match(flippedCards) {
@@ -46,6 +93,9 @@ function match(flippedCards) {
 
       flippedCards.length = 0;//vacia el array
       canFlip = true;//se puede volver a dar vuelta otras cartas
+
+      
+      saveGameState();// Guardar el estado después de hacer match
 
       //-----verifica victoria-----
       const totalMatched = document.querySelectorAll(".card__match").length; //cantidad de cartas ya emparejadas
@@ -87,6 +137,8 @@ function match(flippedCards) {
       });
       flippedCards.length = 0;
       canFlip = true;
+
+      saveGameState();// Guardar el estado después de voltear cartas no emparejadas
     }, 1000);
   }
 }
@@ -97,12 +149,15 @@ function flip(card) {
     gameStarted = true;
   }
 
+  // Verifica si se puede voltear
   if (!canFlip || card.classList.contains("card__flipped") || card.classList.contains("card__match")) {
     return;
   }
 
   flippedCards.push(card);
   card.classList.add("card__flipped");
+
+  saveGameState();// Guardar el estado después de cada flip
 
   //si ya se dieron vuelta dos cartas
   if (flippedCards.length === 2) {
@@ -119,22 +174,90 @@ function shuffle(array) {
   }
 }
 
-async function getCatImages(numberOfImages) {
+async function getCatImages(numberOfImages, loadSavedGame = false) {
+  // Intenta cargar un juego guardado si loadSavedGame es true
+  if (loadSavedGame && loadGameState()) {
+    try {
+      // Obtener el estado guardado del localStorage
+      const gameState = JSON.parse(localStorage.getItem('memoryGameState'));
+      
+      // Limpiar el contenedor de cartas
+      container.innerHTML = "";
+      
+      // Crear un array con todas las cartas
+      const allCards = [...gameState.cards, ...gameState.cards];
+      
+      // Reconstruir el tablero carta por carta
+      allCards.forEach((imageUrl, index) => {
+        // Crear elementos HTML de la carta
+        const card = document.createElement("div");
+        card.classList.add("card");
+        
+        // Verificar si esta carta estaba volteada en el estado guardado
+        const wasFlipped = gameState.flippedCards.some(c => c.index === index);
+        // Verificar si esta carta estaba emparejada en el estado guardado
+        const wasMatched = gameState.matchedCards.some(c => c.index === index);
+        
+        // Aplicar clases según el estado guardado
+        if (wasFlipped) card.classList.add("card__flipped");
+        if (wasMatched) card.classList.add("card__match");
+        
+        // Crear estructura interna de la carta
+        const cardContent = document.createElement("div");
+        cardContent.classList.add("card__content");
+        
+        // Crear elemento de imagen
+        const img = document.createElement("img");
+        img.classList.add("card-img");
+        img.src = imageUrl;
+        img.alt = "imagen de gato";
+        
+        // Definir el manejador de clic para la carta
+        card.clickHandler = () => {
+          if (canFlip && 
+              flippedCards.length < 2 && 
+              !card.classList.contains("card__flipped") && 
+              !card.classList.contains("card__match")) {
+            flip(card);
+          }
+        };
+        
+        // Solo agregar evento de click si la carta no está emparejada
+        if (!wasMatched) {
+          img.onload = () => {
+            card.addEventListener("click", card.clickHandler);
+          };
+        }
+        
+        cardContent.appendChild(img);
+        card.appendChild(cardContent);
+        container.appendChild(card);
+      });
+      
+      // Restaurar variables de control del juego
+      gameStarted = gameState.gameStarted;
+      gameWon = gameState.gameWon;
+      canFlip = true;
+      flippedCards = [];
+      
+      // Si el juego estaba en progreso, reanudar el timer
+      if (gameStarted && !gameWon) {
+        seconds = gameState.seconds;
+        minutes = gameState.minutes;
+        timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        startTimer();
+      }
+      
+      return; // Salir de la función después de cargar el juego guardado
+      
+    } catch (error) {
+      console.error('Error al cargar el juego guardado:', error);
+    }
+  }
+  
+  // Código para iniciar un juego nuevo
   try {
-    const response = await fetch(`https://cataas.com/api/cats?limit=${numberOfImages}`);
-    const data = await response.json();
-
-    //no permite gifs
-    const validImages = data.filter(item =>
-      item.mimetype === 'image/jpeg' || item.mimetype === 'image/png'
-    );
-
-    const selectedImages = validImages.slice(0, numberOfImages);
-    cards = selectedImages.map(item => url + item.id);
-
-    const duplicatedCards = [...cards, ...cards];
-    shuffle(duplicatedCards);
-
+    // Reiniciar todas las variables del juego
     container.innerHTML = "";
     gameStarted = false;
     gameWon = false;
@@ -144,37 +267,79 @@ async function getCatImages(numberOfImages) {
     minutes = 0;
     timerElement.textContent = "00:00";
     stopTimer();
-
+    
+    // Limpiar cualquier estado guardado anterior
+    localStorage.removeItem('memoryGameState');
+    
+    // Obtener imágenes de gatos desde la API
+    const response = await fetch(`https://cataas.com/api/cats?limit=${numberOfImages}`);
+    const data = await response.json();
+    
+    // Filtrar solo imágenes JPEG/PNG (no gifs)
+    const validImages = data.filter(item =>
+      item.mimetype === 'image/jpeg' || item.mimetype === 'image/png'
+    );
+    
+    // Seleccionar el número requerido de imágenes
+    const selectedImages = validImages.slice(0, numberOfImages);
+    // Guardar las URLs de las imágenes seleccionadas
+    cards = selectedImages.map(item => url + item.id);
+    
+    // Crear pares de cartas y mezclarlas
+    const duplicatedCards = [...cards, ...cards];
+    shuffle(duplicatedCards);
+    
+    // Crear las cartas en el DOM
     duplicatedCards.forEach(imageUrl => {
       const card = document.createElement("div");
       card.classList.add("card");
-
+      
       const cardContent = document.createElement("div");
       cardContent.classList.add("card__content");
-
+      
       const img = document.createElement("img");
       img.classList.add("card-img");
       img.src = imageUrl;
       img.alt = "imagen de gato";
-
+      
       card.clickHandler = () => {
-        if (canFlip && flippedCards.length < 2 && !card.classList.contains("card__flipped") && !card.classList.contains("card__match")) {
+        if (canFlip && 
+            flippedCards.length < 2 && 
+            !card.classList.contains("card__flipped") && 
+            !card.classList.contains("card__match")) {
           flip(card);
         }
       };
-
+      
+      // Agregar el evento click después de que la imagen cargue
       img.onload = () => {
-        card.addEventListener("click", card.clickHandler)
+        card.addEventListener("click", card.clickHandler);
       };
-
-      cardContent.appendChild(img)
-      card.appendChild(cardContent)
-      container.appendChild(card)
-    })
-
+      
+      // Construir la estructura de la carta
+      cardContent.appendChild(img);
+      card.appendChild(cardContent);
+      container.appendChild(card);
+    });
+    
   } catch (error) {
     console.error('Error al obtener las imágenes:', error);
+    // Mostrar mensaje de error al usuario
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "No se pudieron cargar las imágenes de gatos. Intenta de nuevo más tarde.",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#3085d6"
+    });
   }
 }
 
-playAgain(3) //iniciar partida
+// Guardar el estado cuando el usuario cierre la página
+window.addEventListener('beforeunload', saveGameState);
+
+// Guardar el estado periódicamente por si acaso
+setInterval(saveGameState, 30000); // Cada 30 segundos
+
+//------INICIAR PARTIDA------
+getCatImages(2, true);// Intenta cargar un juego guardado, si no existe inicia uno nuevo
