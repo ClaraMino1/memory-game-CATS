@@ -159,9 +159,26 @@ function match(flippedCards) {
             playAgain(numberOfPairs) //jugar de nuevo el mismo nivel
           }else if(result.isDenied){
             currentLevel++ //subir de nivel
-            if (currentLevel >= level.length){
-              console.log("pasaste todo el juego")
-            } // si se llega al último nivel
+            if (currentLevel == level.length){// si se completa el último nivel
+              import('https://esm.run/canvas-confetti').then(confetti => {
+                confetti.default({
+                  particleCount: 500,
+                  spread: 120
+                })
+
+              Swal.fire({
+                title: 'FELICIDADES!',
+                html: `
+                  <p>Completaste todos los niveles</p>
+                  <small>Tiempo total: </small>
+                `,
+                confirmButtonText: 'Reiniciar juego'
+                }).then(() => {
+                    currentLevel = 0 //vuelve al nivel 1
+                    playAgain(2)
+                  })
+                })
+            } 
             numberOfPairs = currentLevel === 0 ? 2 : (currentLevel * 2) + 1 //calcula los pares
             playAgain(numberOfPairs)
           }
