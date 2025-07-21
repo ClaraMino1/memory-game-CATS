@@ -1,30 +1,34 @@
 document.querySelectorAll('.accordion-header').forEach(header => { //acordeón de los niveles
   header.addEventListener('click', () => {
     const content = header.nextElementSibling;
-    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-    header.classList.toggle('active');
-  });
-});
+    content.style.display = content.style.display === 'block' ? 'none' : 'block'
+    header.classList.toggle('active')
+  })
+})
 
 const container = document.getElementById("container")
 const timerElement = document.getElementById("timer")
 const url = "https://cataas.com/cat/" //url para luego concatenar la cantidad de imagenes que quiero traer
 
 //para manejar los niveles
-let levelSelected = 2
-const level2 = 5
-const level3 = 7
+let currentLevel = 0; //por defecto se inicia en el nivel 1
+let numberOfPairs = 2
+const level = document.querySelectorAll(".level")
+setupLevelButtons()
 
-const level = document.querySelectorAll(".level").forEach((level,index)=>{ //agrego un evento a cada nivel
-  level.addEventListener("click",(()=>{
-
-    levelSelected = (index*2) + 1 //arma la cantidad de pares de cartas
-    if(index === 0){ //establece el nivel 1 con 2 pares
-      levelSelected = 2
-    }
-    playAgain((levelSelected));
-  }))
-})
+function setupLevelButtons() {
+  level.forEach((levelBtn, index) => {
+    levelBtn.addEventListener("click", () => { //evento click a cada boton de nivel
+      currentLevel = index;
+      if (index === 0) {
+        numberOfPairs = 2; // si es el nivel 1. se usan 2 pares
+      } else { //si es otro nivel se calculan los pares
+        numberOfPairs = (index * 2) + 1
+      }
+      playAgain(numberOfPairs);
+    })
+  })
+}
 
 let cards = []
 let flippedCards = []  // Guarda las cartas que están volteadas temporalmente
@@ -90,33 +94,33 @@ function startTimer() {
       minutes++
       seconds = 0
     }
-    timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  }, 1000);
+    timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+  }, 1000)
 }
 
 function stopTimer() {
-  clearInterval(timerInterval);
+  clearInterval(timerInterval)
 }
 
 function playAgain(numberOfImages){// Limpiar el estado guardado si se inicia un juego nuevo
   // localStorage.removeItem('memoryGameState');
-  getCatImages(numberOfImages);
+  getCatImages(numberOfImages)
 }
 
 function match(flippedCards) {
-  const img1Src = flippedCards[0].querySelector(".card-img").src;
-  const img2Src = flippedCards[1].querySelector(".card-img").src;
+  const img1Src = flippedCards[0].querySelector(".card-img").src
+  const img2Src = flippedCards[1].querySelector(".card-img").src
 
   if (img1Src === img2Src) {
     // espera a que se vea el flip antes de marcar el match
     setTimeout(() => {
       flippedCards.forEach((card) => {
-        card.classList.add("card__match"); //le agrega la clase a cada card emparejada
-        card.removeEventListener("click", card.clickHandler); //le saca el evento click
-      });
+        card.classList.add("card__match") //le agrega la clase a cada card emparejada
+        card.removeEventListener("click", card.clickHandler) //le saca el evento click
+      })
 
-      flippedCards.length = 0;//vacia el array
-      canFlip = true;//se puede volver a dar vuelta otras cartas
+      flippedCards.length = 0//vacia el array
+      canFlip = true//se puede volver a dar vuelta otras cartas
 
       
       // saveGameState();// Guardar el estado después de hacer match
@@ -125,8 +129,8 @@ function match(flippedCards) {
       const totalMatched = document.querySelectorAll(".card__match").length; //cantidad de cartas ya emparejadas
       //si la cantidad de cartas emparejadas es igual a la cantidad de cartas totales y el juago aun no está ganado
       if (totalMatched === cards.length * 2 && !gameWon) {
-        gameWon = true;
-        stopTimer(); //se para el timer para mostrar el timpo de jugada
+        gameWon = true
+        stopTimer() //se para el timer para mostrar el timpo de jugada
 
         // SweetAlert después de que se emparejó el último par
         Swal.fire({
@@ -135,6 +139,9 @@ function match(flippedCards) {
           text: `Tu tiempo: ${timerElement.innerText}`,
           confirmButtonText: "Jugar de nuevo",
           confirmButtonColor: "#3085d6",
+          showDenyButton: true, // activa un segundo botón
+          denyButtonText: "Siguiente nivel",
+          denyButtonColor: "#e94057",
           allowOutsideClick: false, //no permite cerrar el alert con click ni esc
           allowEscapeKey: false,
           width: 550,
@@ -149,7 +156,14 @@ function match(flippedCards) {
           `
         }).then((result)=>{
           if(result.isConfirmed){
-            playAgain(levelSelected) //jugar de nuevo el mismo nivel
+            playAgain(numberOfPairs) //jugar de nuevo el mismo nivel
+          }else if(result.isDenied){
+            currentLevel++ //subir de nivel
+            if (currentLevel >= level.length){
+              console.log("pasaste todo el juego")
+            } // si se llega al último nivel
+            numberOfPairs = currentLevel === 0 ? 2 : (currentLevel * 2) + 1 //calcula los pares
+            playAgain(numberOfPairs)
           }
         })
       }
@@ -366,4 +380,4 @@ window.addEventListener('beforeunload', saveGameState);
 setInterval(saveGameState, 30000); // Cada 30 segundos
 
 //------INICIAR PARTIDA------
-getCatImages(levelSelected, true);// Intenta cargar un juego guardado, si no existe inicia uno nuevo. empieza con el nivel 1
+getCatImages(numberOfPairs, true);// Intenta cargar un juego guardado, si no existe inicia uno nuevo. empieza con el nivel 1
