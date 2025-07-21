@@ -10,6 +10,22 @@ const container = document.getElementById("container")
 const timerElement = document.getElementById("timer")
 const url = "https://cataas.com/cat/" //url para luego concatenar la cantidad de imagenes que quiero traer
 
+//para manejar los niveles
+let levelSelected = 2
+const level2 = 5
+const level3 = 7
+
+const level = document.querySelectorAll(".level").forEach((level,index)=>{ //agrego un evento a cada nivel
+  level.addEventListener("click",(()=>{
+
+    levelSelected = (index*2) + 1 //arma la cantidad de pares de cartas
+    if(index === 0){ //establece el nivel 1 con 2 pares
+      levelSelected = 2
+    }
+    playAgain((levelSelected));
+  }))
+})
+
 let cards = []
 let flippedCards = []  // Guarda las cartas que están volteadas temporalmente
 let canFlip = true
@@ -22,49 +38,49 @@ let minutes = 0
 let timerInterval
 
 function saveGameState(){ //crea un objeto con todo el estado actual del juego y lo guarda en localStorage
- const gameState = {
-    cards: cards, // Las URLs de las imágenes originales
-    flippedCards: Array.from(document.querySelectorAll('.card__flipped')).map(card => { //cartas que se dieron vuelta
-      return {
-        index: Array.from(container.children).indexOf(card),
-        imgSrc: card.querySelector('.card-img').src
-      };
-    }),
-    matchedCards: Array.from(document.querySelectorAll('.card__match')).map(card => { //cartas emparejadas
-      return {
-        index: Array.from(container.children).indexOf(card),
-        imgSrc: card.querySelector('.card-img').src
-      };
-    }),
-    seconds: seconds,
-    minutes: minutes,
-    gameStarted: gameStarted,
-    gameWon: gameWon
-  };
+//  const gameState = {
+//     cards: cards, // Las URLs de las imágenes originales
+//     flippedCards: Array.from(document.querySelectorAll('.card__flipped')).map(card => { //cartas que se dieron vuelta
+//       return {
+//         index: Array.from(container.children).indexOf(card),
+//         imgSrc: card.querySelector('.card-img').src
+//       };
+//     }),
+//     matchedCards: Array.from(document.querySelectorAll('.card__match')).map(card => { //cartas emparejadas
+//       return {
+//         index: Array.from(container.children).indexOf(card),
+//         imgSrc: card.querySelector('.card-img').src
+//       };
+//     }),
+//     seconds: seconds,
+//     minutes: minutes,
+//     gameStarted: gameStarted,
+//     gameWon: gameWon
+//   };
 
-  localStorage.setItem('memoryGameState', JSON.stringify(gameState)) //guarda en localStorage
+//   localStorage.setItem('memoryGameState', JSON.stringify(gameState)) //guarda en localStorage
 }
 
 function loadGameState() {
-  const savedState = localStorage.getItem('memoryGameState');
-  if (!savedState) return false;// Si no hay estado guardado
+  // const savedState = localStorage.getItem('memoryGameState');
+  // if (!savedState) return false;// Si no hay estado guardado
   
-  const gameState = JSON.parse(savedState);
+  // const gameState = JSON.parse(savedState);
   
-  // Restaurar las variables básicas
-  cards = gameState.cards;
-  seconds = gameState.seconds;
-  minutes = gameState.minutes;
-  gameStarted = gameState.gameStarted;
-  gameWon = gameState.gameWon;
+  // // Restaurar las variables básicas
+  // cards = gameState.cards;
+  // seconds = gameState.seconds;
+  // minutes = gameState.minutes;
+  // gameStarted = gameState.gameStarted;
+  // gameWon = gameState.gameWon;
   
-  // Actualizar el timer
-  timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  if (gameStarted && !gameWon) {
-    startTimer();// Reanuda el temporizador si el juego estaba empezado y no ganado
-  }
+  // // Actualizar el timer
+  // timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  // if (gameStarted && !gameWon) {
+  //   startTimer();// Reanuda el temporizador si el juego estaba empezado y no ganado
+  // }
   
-  return true;
+  // return true;
 }
 
 function startTimer() {
@@ -83,7 +99,7 @@ function stopTimer() {
 }
 
 function playAgain(numberOfImages){// Limpiar el estado guardado si se inicia un juego nuevo
-  localStorage.removeItem('memoryGameState');
+  // localStorage.removeItem('memoryGameState');
   getCatImages(numberOfImages);
 }
 
@@ -103,7 +119,7 @@ function match(flippedCards) {
       canFlip = true;//se puede volver a dar vuelta otras cartas
 
       
-      saveGameState();// Guardar el estado después de hacer match
+      // saveGameState();// Guardar el estado después de hacer match
 
       //-----verifica victoria-----
       const totalMatched = document.querySelectorAll(".card__match").length; //cantidad de cartas ya emparejadas
@@ -133,7 +149,7 @@ function match(flippedCards) {
           `
         }).then((result)=>{
           if(result.isConfirmed){
-            playAgain(3)
+            playAgain(levelSelected) //jugar de nuevo el mismo nivel
           }
         })
       }
@@ -350,4 +366,4 @@ window.addEventListener('beforeunload', saveGameState);
 setInterval(saveGameState, 30000); // Cada 30 segundos
 
 //------INICIAR PARTIDA------
-getCatImages(2, true);// Intenta cargar un juego guardado, si no existe inicia uno nuevo
+getCatImages(levelSelected, true);// Intenta cargar un juego guardado, si no existe inicia uno nuevo. empieza con el nivel 1
