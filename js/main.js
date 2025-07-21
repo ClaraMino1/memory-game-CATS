@@ -167,12 +167,9 @@ function match(flippedCards) {
                 })
 
               Swal.fire({
-                title: 'FELICIDADES!',
-                html: `
-                  <p>Completaste todos los niveles</p>
-                  <small>Tiempo total: </small>
-                `,
-                confirmButtonText: 'Reiniciar juego'
+                title: "¡FELICIDADES!",
+                text:"Completaste todos los niveles",
+                confirmButtonText: "Reiniciar juego"
                 }).then(() => {
                     currentLevel = 0 //vuelve al nivel 1
                     playAgain(2)
