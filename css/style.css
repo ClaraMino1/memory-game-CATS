@@ -6,8 +6,8 @@
   --dark: #333;
   --light: #fff;
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --card-gap: 3rem; /* Espacio reducido entre cartas */
-  --card-size: clamp(85px, 8vw, 120px); /* Tamaño más compacto */
+  --card-gap: 3rem; 
+  --card-size: clamp(85px, 8vw, 120px); 
 }
 
 * {
