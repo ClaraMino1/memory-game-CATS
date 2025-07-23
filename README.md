@@ -12,7 +12,7 @@
 - Imágenes de gatos aleatorias en cada partida.
 - 10 niveles de dificultad, con más cartas en cada nivel.
 - Temporizador para desafiar tu memoria.
-- Guardado automático del progreso en el navegador.
+
 
 
 ## Dependencias
