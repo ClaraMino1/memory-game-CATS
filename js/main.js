@@ -6,6 +6,7 @@ document.querySelectorAll('.accordion-header').forEach(header => { //acordeón d
   })
 })
 
+const ShowLevel = document.getElementById("current-level-display") //agarro el elemento para mostrar el nivel actual
 const container = document.getElementById("container")
 const timerElement = document.getElementById("timer")
 const url = "https://cataas.com/cat/" //url para luego concatenar la cantidad de imagenes que quiero traer
@@ -26,6 +27,7 @@ function setupLevelButtons() {
         numberOfPairs = (index * 2) + 1
       }
       playAgain(numberOfPairs)
+      ShowLevel.innerText = `${currentLevel + 1}` //muestra en pantalla el nivel actual
     })
   })
 }
@@ -223,8 +225,17 @@ function flip(card) {
 //reparte aleatoriamente
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    [array[i], array[j]] = [array[j], array[i]]
+  const j = Math.floor(Math.random() * (i + 1));
+  [array[i], array[j]] = [array[j], array[i]];
+}
+}
+
+function setCardLayoutByLevel() {
+  const container = document.getElementById('container');
+  if (currentLevel >= 6) { // nivel 7 es currentLevel 6 (base 0)
+    container.classList.add('horizontal-layout');
+  } else {
+    container.classList.remove('horizontal-layout');
   }
 }
 
@@ -302,6 +313,7 @@ async function getCatImages(numberOfImages, loadSavedGame = false) {
         startTimer()
       }
       
+      setCardLayoutByLevel();
       return // Salir de la función después de cargar el juego guardado
       
     } catch (error) {
@@ -376,6 +388,8 @@ async function getCatImages(numberOfImages, loadSavedGame = false) {
       container.appendChild(card)
     })
     
+    // Ajustar el layout después de repartir las cartas
+    setCardLayoutByLevel();
   } catch (error) {
     console.error('Error al obtener las imágenes:', error)
     // Mostrar mensaje de error al usuario
@@ -388,6 +402,32 @@ async function getCatImages(numberOfImages, loadSavedGame = false) {
     });
   }
 }
+
+//ésta función sirve para ajustar las cartas segun la cantida de pares (funcion visual)
+function adjustCardLayout() {
+  const container = document.getElementById('container');
+  const cards = container.querySelectorAll('.card');
+  if (cards.length === 0) return;
+
+  const containerWidth = container.clientWidth;
+  const cardWidth = parseInt(window.getComputedStyle(cards[0]).width);
+  const gap = parseInt(window.getComputedStyle(container).gap);
+  
+  // Calcular máximo de columnas que entran sin scroll horizontal
+  const maxColumns = Math.floor((containerWidth + gap) / (cardWidth + gap));
+  
+  // Asegurar número par de columnas
+  const bestColumns = Math.min(
+  maxColumns % 2 === 0 ? maxColumns : maxColumns - 1,
+  6 // Máximo 6 columnas
+);
+  
+  container.style.gridTemplateColumns = `repeat(${Math.max(2, bestColumns)}, minmax(${cardWidth}px, 1fr))`;
+}
+
+// Ejecutar al cargar y al redimensionar
+window.addEventListener('load', adjustCardLayout);
+window.addEventListener('resize', adjustCardLayout);
 
 // Guardar el estado cuando el usuario cierre la página
 window.addEventListener('beforeunload', saveGameState)

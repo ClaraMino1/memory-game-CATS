@@ -1,50 +1,137 @@
-*{
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-    font-family: sans-serif;
-}
-
- :root {
+:root {
   --bg: #fafafa;
   --hotpink: #e94057;
   --red: #f22121;
   --gradient: linear-gradient(35deg, var(--red), var(--hotpink));
+  --dark: #333;
+  --light: #fff;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --card-gap: 3rem; /* Espacio reducido entre cartas */
+  --card-size: clamp(85px, 8vw, 120px); /* Tamaño más compacto */
 }
 
-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem 2rem;
-    position: relative;
-    height: 80px;
-    background: var(--bg);
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  margin: auto;
+  background-color: var(--bg);
   min-height: 100vh;
-  background: var(--bg);
-  font-size: 2rem;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
-#container {
+.game-container {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  align-content: center;
-  max-width: 50rem;
-  margin: auto;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 2500px; 
+  margin: 0 auto;
+  padding: 0 0.5rem;
 }
 
-/* ACORDEÓN*/
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  height: 80px;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 25%;
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.header-center h1 {
+  color: var(--hotpink);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+#current-level {
+  font-size: 1rem;
+  color: var(--dark);
+  background: rgba(233, 64, 87, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+#current-level-display {
+  font-weight: bold;
+  color: var(--hotpink);
+}
+
+.game-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  padding: 0.5rem 0; 
+}
+
+.cards-container {
+   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--card-size), 1fr));
+  gap: var(--card-gap);
+  width: 30%; 
+  margin: 0 auto;
+  justify-items: center; 
+  align-items: center; 
+  place-items: center; 
+}
+
+.cards-container.horizontal-layout {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, var(--card-size)); /* máximo 5 filas */
+  grid-auto-columns: var(--card-size);
+  gap: var(--card-gap);
+  width: 98vw;
+  max-width: 1800px;
+  min-height: calc(var(--card-size) * 5 + var(--card-gap) * 4);
+  max-height: calc(var(--card-size) * 5 + var(--card-gap) * 4);
+  overflow-x: auto;
+  overflow-y: hidden;
+  justify-items: center;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin: 0 auto;
+  justify-content: center;
+}
+.cards-container.horizontal-layout .card {
+  width: var(--card-size);
+  height: var(--card-size);
+}
+
+.game-footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: var(--dark);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: auto;
+}
+
+/* ACORDEÓN */
 .accordion {
-  position: absolute;
-  left: 2rem;
-  top: 1.5rem;
+  position: relative;
+  z-index: 100;
 }
 
 .accordion-item {
@@ -53,60 +140,53 @@ body {
 
 .accordion-header {
   background: var(--gradient);
-  color: #fff;
+  color: var(--light);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1.4rem;
+  font-size: 1rem;
   width: 100%;
   text-align: center;
   transition: all 0.3s ease;
-}
-
-.accordion-header:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow);
 }
 
 .accordion-content {
   position: absolute;
-  right: 0;
-  top: 100%;
   width: 100%;
-  background: #fff;
+  background: var(--light);
   border-radius: 0 0 5px 5px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
   display: none;
-  z-index: 100;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .accordion-content p {
-  padding: 0.5rem;
+  padding: 0.75rem;
   margin: 0;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: all 0.2s;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .accordion-content p:hover {
-  background: #f5f5f5;
   color: var(--hotpink);
-}
-
-.accordion-item.active .accordion-content {
-  display: block;
+  background-color: rgba(233, 64, 87, 0.1);
 }
 
 .accordion-item.active .accordion-header {
   border-radius: 5px 5px 0 0;
+  margin-bottom: 0;
 }
 
+/* CARTAS */
 .card {
-  width: 6rem;
-  height: 6rem;
-  margin: 0.5rem;
-  border-radius: 0.3em;
+  width: var(--card-size);
+  height: var(--card-size);
+  border-radius: 0.8em; 
   background-image: var(--gradient);
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25), 4px 4px 10px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -114,6 +194,7 @@ body {
   cursor: pointer;
   backface-visibility: hidden;
   transform-style: preserve-3d;
+  aspect-ratio: 1/1;
 }
 
 .card__content {
@@ -124,13 +205,13 @@ body {
   bottom: 0;
   transform: rotateY(-180deg);
   backface-visibility: hidden;
-  background-color: #fff;
+  background-color: var(--light);
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25), 4px 4px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 0.3em;
+  border-radius: 0.4em;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2.5rem;
+  font-size: 2rem; 
 }
 
 .card__content::selection {
@@ -145,8 +226,22 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 0.4em; 
 }
 
+/* TIMER */
+#timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--hotpink);
+  background: rgba(233, 64, 87, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  min-width: 90px;
+  text-align: center;
+}
+
+/* ANIMACIONES */
 @keyframes matchFade {
   0% {
     transform: scale(1);
@@ -167,11 +262,3 @@ body {
   pointer-events: none;
 }
 
-#timer {
-  margin-top: 15px;
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--hotpink);
-  text-align: center;
-  flex-grow: 1;
-}

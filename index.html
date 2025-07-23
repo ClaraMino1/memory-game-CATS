@@ -1,39 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="./js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/style.css">
-    <title>Memory Game </title>
+    <title>Memory Game CATS</title>
 </head>
 <body>
-
-    <header>
-        
-        <div class="accordion">
-            <div class="accordion-item">
-                <button class="accordion-header">Niveles</button>
-                <div class="accordion-content">
-                    <p class="level">Nivel 1</p>
-                    <p class="level">Nivel 2</p>
-                    <p class="level">Nivel 3</p>
-                    <p class="level">Nivel 4</p>
-                    <p class="level">Nivel 5</p>
-                    <p class="level">Nivel 6</p>
-                    <p class="level">Nivel 7</p>
-                    <p class="level">Nivel 8</p>
-                    <p class="level">Nivel 9</p>
-                    <p class="level">Nivel 10</p>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="header-left">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header">Niveles</button>
+                        <div class="accordion-content">
+                            <p class="level">Nivel 1</p>
+                            <p class="level">Nivel 2</p>
+                            <p class="level">Nivel 3</p>
+                            <p class="level">Nivel 4</p>
+                            <p class="level">Nivel 5</p>
+                            <p class="level">Nivel 6</p>
+                            <p class="level">Nivel 7</p>
+                            <p class="level">Nivel 8</p>
+                            <p class="level">Nivel 9</p>
+                            <p class="level">Nivel 10</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="current-level">
+                    Nivel actual: <span id="current-level-display">1</span>
                 </div>
             </div>
-        </div>
-
-        <div id="timer"></div>
-    </header>
-    
-    <div id="container"></div>
-    
+            
+            <div class="header-center">
+                <h1>Memory de Gatos</h1>
+            </div>
+            
+            <div class="header-right">
+                <div id="timer">00:00</div>
+            </div>
+        </header>
+        
+        <main class="game-main">
+            <div id="container" class="cards-container"></div>
+        </main>
+        
+        <footer class="game-footer">
+            <p>© 2025 Memory Game - Desarrollado con por Clara Miño</p>
+        </footer>
+    </div>
 </body>
 </html>
