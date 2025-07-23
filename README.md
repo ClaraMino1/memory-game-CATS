@@ -19,6 +19,3 @@
 - [SweetAlert2](https://sweetalert2.github.io/) para los mensajes de victoria y errores.
 - [Cataas API](https://cataas.com/) para las imágenes de gatos.
 - [canvas-confetti](https://www.npmjs.com/package/canvas-confetti) para la animación de confeti al completar todos los niveles.
-
-
-- Desarrollado por Clara Miño.
